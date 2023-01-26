@@ -1,34 +1,27 @@
-import React, { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { SocketContext } from '../components/GameContainer';
-
+import React, { useContext, useState } from "react";
+import { SocketContext } from './GameContainer';
 import { 
-    Container, 
-    VStack,
-    HStack, 
     Box, 
     Button,
-    Text,
-    AspectRatio
+    Text, 
+    VStack, 
+    HStack,
+    Spinner
+} from "@chakra-ui/react";
+import { CheckCircleIcon } from '@chakra-ui/icons';
 
-} from '@chakra-ui/react';
-import Header from '../components/Header';
-
-function Party({ startMatching }) {
+function LoadingCard({ isHost, finishMatching }) {
     
-    const partyId = useSelector((state) => state.user.partyId);
-    const isHost = useSelector((state) => state.user.isHost);
-    const { partyMembers } = useContext(SocketContext);
-    let [ isLoading, setLoading ] = useState(false);
+    const { partyMembers, isGroupFinished } = useContext(SocketContext);
+    const [ isLoading, setLoading ] = useState(false);
 
     function handleButtonPress() {
         setLoading(true);
-        startMatching();
+        finishMatching();
     }
 
-    return (
-        <div className='main'>
-            <Header />
+    return(
+        <>
             <Box 
                 display='flex'
                 alignItems='center'
@@ -44,25 +37,42 @@ function Party({ startMatching }) {
                     spacing={3} 
                     margin='0'
                 >
-
                     <Text fontSize='xl' as='b'>
-                        Code: {partyId}
+                        Your Group Is Still Voting...
                     </Text>
 
                     {Object.keys(partyMembers).map((name, index) => (
-                        <Box 
+                        <HStack 
                             key={index}
                             width="100%" 
                             height="42px"
                             display="flex" 
-                            justifyContent="center"
+                            justifyContent="left"
                             borderWidth="1px"
                             borderRadius="md" 
                             bg="white"
                             p="2"
-                        >
-                            {name}
-                        </Box>
+                        >  
+                            {
+                                partyMembers[name] ?
+                                    <CheckCircleIcon 
+                                        color='primary'
+                                        width='24px'
+                                        height='24px'
+                                    />
+                                :   
+                                    <Spinner 
+                                        color='primary'
+                                        size='md'
+                                        speed='1.0s'
+                                    />
+                            } 
+                            <Text
+                                pl='4px'
+                            >
+                                {name}
+                            </Text>
+                        </HStack>
                     ))}
 
                     {[...Array(6 - Object.keys(partyMembers).length).keys()].map((index) => (
@@ -79,31 +89,24 @@ function Party({ startMatching }) {
                         />
                     ))}
 
-                    {
-                        isHost ? 
+                    {isHost ?
+                        <>
                             <Button 
-                                variant="primary" 
+                                variant="primary"
                                 onClick={() => handleButtonPress()}
+                                isDisabled={isGroupFinished ? false : true}
                                 isLoading={isLoading}
                             >
-                                Start Matching
+                                Finish Game
                             </Button>
-                        :
-                            <Box 
-                                size="lg"
-                                width="100%"
-                                display="flex"
-                                justifyContent="center"
-                                fontSize="xl"
-                                fontWeight="bold"
-                            >
-                                Waiting for host to start...
-                            </Box>
+                        </>
+                    :
+                        null
                     }
-                </VStack>
+                </VStack>               
             </Box>
-        </div>
+        </>
     );
 };
 
-export default Party;
+export default LoadingCard;
