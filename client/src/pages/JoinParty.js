@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { setPartyId, setNickname, setConnection } from '../redux/user';
 import axios from 'axios';
 
-import { Container, Stack, Input, Button, Box } from '@chakra-ui/react';
+import { Stack, Input, Button } from '@chakra-ui/react';
 
 import Logo from '../components/Logo';
 import Error from '../components/ErrorMessage';
@@ -26,7 +26,7 @@ function JoinParty() {
 			partyId: codeInput
 		};
 		axios
-			.post('http://localhost:9000/party/join', params)
+			.post(`${process.env.REACT_APP_BACKEND_URL}/party/join`, params)
 			.then(() => {
 				dispatch(setPartyId(codeInput));
             	dispatch(setNickname(nicknameInput));

@@ -13,7 +13,6 @@ const { Server } = require('socket.io');
 const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: "http://localhost:3000",
 		methods: ["GET", "POST"]
 	}
 });
@@ -24,14 +23,14 @@ app.use("/party", partyRouter);
 const InitiateMongoServer = require("./config/db");
 InitiateMongoServer();
 
-const PORT = process.env.PORT || 9000;
+require('dotenv').config();
+const PORT = process.env.PORT;
 
 
 io.on('connection', (socket) => {
-	console.log(`a user connected: ${socket.id}`);
+	// console.log(`a user connected: ${socket.id}`);
 
 	socket.on('party-creation', (data) => {
-		console.log(socket.id);
 		socket.join(data.partyId);
 	});
 
@@ -54,7 +53,7 @@ io.on('connection', (socket) => {
 
 	// executed when a user disconnects from the server
 	socket.on('disconnect', () => {
-		console.log('A user disconnected');
+		// console.log('A user disconnected');
 	});
 });
 
